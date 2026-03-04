@@ -1,0 +1,105 @@
+name: Mayble News Digest (MBL)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 11 * * *"  # 08:00 São Paulo (UTC-3)
+    - cron: "0 21 * * *"  # 18:00 São Paulo (UTC-3)
+
+concurrency:
+  group: mayble-news-digest
+  cancel-in-progress: true
+
+permissions:
+  contents: write  # necessário porque o job commita os caches
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # Limites
+  MAX_POSTS_PER_RUN: "4"
+  MAX_VLR_PER_RUN: "2"
+  MAX_THESPIKE_PER_RUN: "2"
+
+  # Logs
+  LOG_LEVEL: "INFO"
+
+  # Tradução
+  TRANSLATE_PT: "1"
+  TRANSLATE_ONLY_VLR: "1"
+
+  # Cache (mantém arquivo pequeno/estável)
+  CACHE_KEEP_DAYS: "30"
+  CACHE_MAX_ITEMS: "2000"
+  TRANSLATE_CACHE_MAX_ITEMS: "2000"
+
+  # Branding (MBL)
+  EMBED_COLOR: "16742912"
+  BRAND_NAME: "Mayble eSports (MBL)"
+  BRAND_URL: "https://mayble.com.br"
+  FOOTER_TEXT: "Mayble eSports • @mayblegg"
+  BRAND_ICON_URL: "https://cdn.discordapp.com/attachments/1440760869964484738/1478779402614608024/logo_4k-Photoroom.png?ex=69a9a423&is=69a852a3&hm=7bede44e52378dfb966d0f663a799c8fac1936b000df84bd3a4fe05ad34f4369&"
+  BRAND_THUMBNAIL_URL: "https://cdn.discordapp.com/attachments/1440760869964484738/1478854923075453155/ChatGPT_Image_4_de_mar._de_2026_16_57_54.png?ex=69a9ea79&is=69a898f9&hm=5f59390b9ad9d68a468b1dc7fc43af7670d9214a4e06d3a86d833cdf79a3e54a&"
+
+  # Fallback p/ compatibilidade com script antigo (se ainda ler "VORAX_LOGO_URL")
+  VORAX_LOGO_URL: "https://cdn.discordapp.com/attachments/1440760869964484738/1478779402614608024/logo_4k-Photoroom.png?ex=69a9a423&is=69a852a3&hm=7bede44e52378dfb966d0f663a799c8fac1936b000df84bd3a4fe05ad34f4369&"
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install deps
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Sanity check (secret)
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${DISCORD_WEBHOOK_URL:-}" ]]; then
+            echo "Missing secret: DISCORD_WEBHOOK_URL"
+            exit 1
+          fi
+
+      - name: Run bot
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+          python bot_noticias_digest_ptbr.py
+
+      - name: Commit state (anti-duplicado)
+        run: |
+          set -euo pipefail
+          git config user.name "mbl-news-bot"
+          git config user.email "bot@mayble.local"
+
+          # reduz chance de conflito de push entre runs
+          git pull --rebase
+
+          git add posted_cache.json translate_cache.json || true
+          if git diff --cached --quiet; then
+            echo "No cache changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: update news cache"
+          git push origin HEAD:main
