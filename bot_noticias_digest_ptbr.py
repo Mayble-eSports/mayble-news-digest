@@ -157,12 +157,10 @@ class Config:
 
         # Defaults (MBL assets)
         default_logo = (
-            "https://cdn.discordapp.com/attachments/1440760869964484738/1478779402614608024/"
-            "logo_4k-Photoroom.png"
+            "https://cdn.discordapp.com/attachments/1458537563621949576/1478832921644236931/logo_4k-Photoroom.png?"
         )
         default_banner = (
-            "https://cdn.discordapp.com/attachments/1440760869964484738/1478854923075453155/"
-            "ChatGPT_Image_4_de_mar._de_2026_16_57_54.png"
+            "https://cdn.discordapp.com/attachments/1458537563621949576/1478832939168039053/Design_sem_nome_4.png?"
         )
 
         # Prefer new envs; keep legacy fallback if someone ainda usa
