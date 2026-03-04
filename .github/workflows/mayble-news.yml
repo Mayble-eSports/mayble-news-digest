@@ -46,7 +46,7 @@ env:
 
   # Ícone/Thumbnail = LOGO
   BRAND_ICON_URL: "https://cdn.discordapp.com/attachments/1458537563621949576/1478832921644236931/logo_4k-Photoroom.png?ex=69a9d5fb&is=69a8847b&hm=51a737254c927d254415e3f2c998f96777aec4e8899d80e8eadf6beb787db0b4&"
-  BRAND_THUMBNAIL_URL: "https://cdn.discordapp.com/attachments/1458537563621949576/1478832921644236931/logo_4k-Photoroom.png?ex=69a9d5fb&is=69a8847b&hm=51a737254c927d254415e3f2c998f96777aec4e8899d80e8eadf6beb787db0b4&"
+  BRAND_THUMBNAIL_URL: "https://cdn.discordapp.com/attachments/1458537563621949576/1478885874765922595/LOGo-Photoroom.png?ex=69aa074c&is=69a8b5cc&hm=432c9a95bc70fbd8a38a5757b2651e5bf1dc53387b17a47415c12d8c9648c2e4&"
 
   # Fallback p/ compatibilidade com script antigo (se ainda ler "VORAX_LOGO_URL")
   VORAX_LOGO_URL: "https://cdn.discordapp.com/attachments/1440760869964484738/1478779402614608024/logo_4k-Photoroom.png?ex=69a9a423&is=69a852a3&hm=7bede44e52378dfb966d0f663a799c8fac1936b000df84bd3a4fe05ad34f4369&"
