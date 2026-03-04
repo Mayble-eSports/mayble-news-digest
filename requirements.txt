@@ -1,0 +1,6 @@
+# Runtime dependencies (Mayble News Digest - MBL)
+# Version ranges keep the project stable while allowing safe updates.
+
+requests>=2.31.0,<3
+beautifulsoup4>=4.12.2,<5
+lxml>=5.1.0,<6
